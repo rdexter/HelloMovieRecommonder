@@ -8,7 +8,7 @@ import com.movie.entity.MovieUserMatrix;
 
 public interface MovieService {
 	
-	List<Long> getRecommondation(long userId);
+	List<Movie> getRecommondation(long userId);
 	
 	int addMovieRating(MovieUserMatrix matrix);
 	

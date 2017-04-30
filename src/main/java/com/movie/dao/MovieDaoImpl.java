@@ -89,7 +89,7 @@ public class MovieDaoImpl implements MovieDao {
 		}catch(Exception e){
 			LOGGER.info("Exception occured..."+e);
 		}
-		
+
 		return null;
 	}
 
@@ -109,7 +109,7 @@ public class MovieDaoImpl implements MovieDao {
 		}catch(Exception e){
 			LOGGER.info("Exception occured..."+e);
 		}
-		
+
 		return null;
 	}
 
@@ -130,7 +130,7 @@ public class MovieDaoImpl implements MovieDao {
 		}catch(Exception e){
 			LOGGER.info("Exception occured..."+e);
 		}
-		
+
 		return null;
 	}
 
@@ -148,7 +148,7 @@ public class MovieDaoImpl implements MovieDao {
 				m.setId(Long.valueOf(map.get("movie_id").toString()));
 				m.setTitle(map.get("movie_name").toString());
 				m.setUrl(map.get("url").toString());
-				
+
 				movieList.add(m);
 			}
 			return movieList;
@@ -164,13 +164,42 @@ public class MovieDaoImpl implements MovieDao {
 
 	public int updateMovieRating(MovieUserMatrix matrix) {
 		LOGGER.info("Entering into updateMovieRating .. "+matrix.toString());
-		
+
 		try{
 			String updateSql="UPDATE rating set ratings=? where user_id=? and movie_id=?";
-			return jdbcTemplate.update(updateSql, matrix.getRating(),matrix.getUserId(),matrix.getMovieId());
+			int rowUpdated=jdbcTemplate.update(updateSql, matrix.getRating(),matrix.getUserId(),matrix.getMovieId());
+			if(rowUpdated==1){
+				return rowUpdated;
+			}
+			else{
+				return addMovieRating(matrix);
+			}
+
 		}catch(Exception e){
 			LOGGER.info("Exception occured..."+e);
 		}
 		return 0;
+	}
+
+	public List<Movie> getMoviesByUserIds(List<Long> movieIdArray) {
+		LOGGER.info("Entering into updateMovieRating .. "+movieIdArray.toString());
+
+		try{
+			String sql="SELECT movie_id,movie_name,url FROM movie where movie_id in (?)";
+			List<Movie> movieList=new ArrayList<Movie>();
+			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql,movieIdArray);
+			for (Map<String, Object> map : resultSet) {
+				Movie m=new Movie();
+				m.setId(Long.valueOf(map.get("movie_id").toString()));
+				m.setTitle(map.get("movie_name").toString());
+				m.setUrl(map.get("url").toString());
+
+				movieList.add(m);
+			}
+			return movieList;
+		}catch(Exception e){
+			LOGGER.info("Exception occured..."+e);
+		}
+		return null;
 	}
 }

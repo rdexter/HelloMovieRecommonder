@@ -4,6 +4,9 @@
 <%-- <%@taglib prefix="sec" --%>
 <%-- 	uri="http://www.springframework.org/security/tags"%> --%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
+<%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <html>
 <head>
@@ -12,7 +15,7 @@
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Asap">
 <link rel="stylesheet"
 	href="//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.2/css/bootstrap.min.css">
-	 <script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.0.min.js"></script> 
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.0.min.js"></script>
 <style type="text/css">
 * {
 	font-family: 'Asap';
@@ -20,6 +23,10 @@
 </style>
 </head>
 <body>
+	<h6>
+		<a href="<c:url value='j_spring_security_logout'/>">Click here to
+			logout</a>
+	</h6>
 	<div style="margin-top: 16px;" class="container">
 		<div class="row">
 			<div class="col-xs-12">
@@ -75,7 +82,7 @@
 					</c:forEach>
 
 				</div>
-		<!-- 		<div class="row">
+				<!-- 		<div class="row">
 					<div class="col-xs-12">
 						<h2>All Movies</h2>
 					</div>

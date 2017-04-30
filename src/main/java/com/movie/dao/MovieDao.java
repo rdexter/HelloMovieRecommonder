@@ -25,5 +25,7 @@ public interface MovieDao {
 	
 	int addMovieRating(MovieUserMatrix matrix);
 
+	List<Movie> getMoviesByUserIds(List<Long> movieIdArray);
+
 
 }

@@ -81,13 +81,13 @@ public class MovieController {
 		LOGGER.info("Entering into getUserRecommondation : " + userId);
 		JSONObject respJson=new JSONObject();
 		String apiName="getUserRecommondation";
-		List<Long> movieIds=service.getRecommondation(userId);
+		List<Movie> movieIds=service.getRecommondation(userId);
 		respJson.put("Recommonded MovieIds", movieIds);
 		logProcessingTime(apiName, start);
 		return respJson;
 	}
-	
-	
+
+
 	/*@RequestMapping(value = "/home", method = RequestMethod.GET)
 	@ResponseBody
 	public JSONArray home(@RequestParam("userId") long userId){
@@ -100,7 +100,7 @@ public class MovieController {
 		logProcessingTime(apiName, start);
 		return jsonArray;
 	}*/
-	
+
 	@RequestMapping(value = "/home", method = RequestMethod.GET)
 	@ResponseBody
 	//public ModelAndView home(@RequestParam("userId") long userId,@RequestParam("offset") int offset) {
@@ -119,7 +119,7 @@ public class MovieController {
 		model.setViewName("home");
 		return model;
 	}
-	
+
 	@RequestMapping(value = "/home1", method = RequestMethod.GET)
 	@ResponseBody
 	public JSONArray home1(@RequestParam("userId") long userId,@RequestParam("offset") int offset) {
@@ -137,24 +137,26 @@ public class MovieController {
 		model.setViewName("home");
 		return jsonArray;
 	}
-	
-	 @RequestMapping(value = "/home2", method = RequestMethod.GET)
-	   public String home2(ModelMap model) {
-		 long start = System.currentTimeMillis();
-			String apiName="home";
-			LOGGER.info("REQUEST home : ");
-			long userId=196;
-			int offset=1;
-			List<Movie> movieList=service.getMovies(userId,offset);
-			model.addObject("movieList", movieList);
-			model.addObject("msg", "Hello moto");
-			LOGGER.info("movieList home : "+movieList.toString());
-			logProcessingTime(apiName, start);
-			return "home";
-	   }
 
-	
-	
+	@RequestMapping(value = "/home2", method = RequestMethod.GET)
+	public String home2(ModelMap model) {
+		long start = System.currentTimeMillis();
+		String apiName="home";
+		LOGGER.info("REQUEST home : ");
+		long userId=196;
+		int offset=1;
+		List<Movie> movieList=service.getMovies(userId,offset);
+		model.addObject("movieList", movieList);
+		model.addObject("msg", "Hello moto");
+		LOGGER.info("movieList home : "+movieList.toString());
+		List<Movie> recommondedMovieList=service.getRecommondation(userId);
+		model.addObject("recommondedMovieList", recommondedMovieList);
+		logProcessingTime(apiName, start);
+		return "home";
+	}
+
+
+
 	@RequestMapping(value = "/addMovieLikeByTheUser", method = RequestMethod.GET)
 	@ResponseBody
 	public int addMovieLikeByTheUser(@RequestBody String jsonString){

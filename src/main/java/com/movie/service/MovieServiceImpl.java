@@ -19,6 +19,7 @@ import com.movie.utils.MovieUtils;
 public class MovieServiceImpl implements MovieService {
 	/** The logger. */
 	private static final Logger LOGGER = Logger.getLogger(MovieServiceImpl.class);
+	private static final int RECOMMONDETION_LIMIT = 4;
 	@Autowired
 	private MovieDao dao;
 
@@ -104,7 +105,7 @@ public class MovieServiceImpl implements MovieService {
 		return Z;
 	}
 
-	public List<Long> getRecommondation(long userId){
+	public List<Movie> getRecommondation(long userId){
 		LOGGER.info("Entering into getRecommondation..."+userId);
 		
 		List<Long> movieIds=dao.getMoviesNotRatedByTheUsers(userId);
@@ -126,7 +127,10 @@ public class MovieServiceImpl implements MovieService {
 			sortedMovieIds.add(entry.getKey());
 		}
 		LOGGER.info("sortedMovieIds..."+sortedMovieIds);
-		return sortedMovieIds;
+		int toIndex=sortedMovieIds.size()>RECOMMONDETION_LIMIT?RECOMMONDETION_LIMIT : sortedMovieIds.size();
+		List<Long> movieIdArray=sortedMovieIds.subList(0, toIndex);
+		List<Movie> sortedMovieList=dao.getMoviesByUserIds(movieIdArray);
+		return sortedMovieList;
 	}
 
 	public int addMovieRating(MovieUserMatrix matrix) {
