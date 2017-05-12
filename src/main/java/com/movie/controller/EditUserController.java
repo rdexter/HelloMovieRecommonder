@@ -29,7 +29,7 @@ public class EditUserController {
    public String login(ModelMap model) {
        return "login";
    }
-
+	
    @RequestMapping(value = "/accessdenied", method = RequestMethod.GET)
    public String loginerror(ModelMap model) {
        model.addAttribute("error", "true");
@@ -59,6 +59,6 @@ public class EditUserController {
 
        securityService.autologin(userForm.getUsername(), userForm.getPasswordConfirm());
 
-       return "redirect:/login";
+       return "redirect:/home2";
    }
 }
