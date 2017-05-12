@@ -30,4 +30,9 @@ public class UserManagerImpl implements UserManager {
 		userDao.deleteUser(userId);
 	}
 
+	public Long getUserId(String userName) {
+		return userDao.getUserId(userName);
+	}
+	
+	
 }

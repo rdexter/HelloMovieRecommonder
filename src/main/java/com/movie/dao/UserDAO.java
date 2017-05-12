@@ -13,4 +13,5 @@ public interface UserDAO
     public List<UserEntity> getAllUsers();
     public void deleteUser(Integer userId);
     public UserDetails loadUserByUsername(String username);
+	public Long getUserId(String userName);
 }

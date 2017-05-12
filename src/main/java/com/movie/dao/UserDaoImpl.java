@@ -17,6 +17,22 @@ public class UserDaoImpl implements UserDAO,UserDetailsService{
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 	
+	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
+		this.jdbcTemplate = jdbcTemplate;
+	}
+
+	public Long getUserId(String userName) {
+		String sql="SELECT id from user where user_name=?";
+		try{
+			Long userId=jdbcTemplate.queryForObject(sql, Long.class, userName);
+			return userId;
+		}
+		catch(Exception e){
+			System.out.println("Exception occured getting userId for userName"+userName+"  \n"+e);
+		}
+		return null;
+	}
+	
 	public void addUser(UserEntity user) {
 		// TODO Auto-generated method stub
 		
@@ -69,8 +85,6 @@ public class UserDaoImpl implements UserDAO,UserDetailsService{
 		return null;
 	}
 
-	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-		this.jdbcTemplate = jdbcTemplate;
-	}
+	
 
 }

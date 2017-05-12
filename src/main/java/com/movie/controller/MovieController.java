@@ -16,6 +16,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.movie.entity.Movie;
 import com.movie.entity.MovieUserMatrix;
 import com.movie.service.MovieService;
+import com.movie.service.UserManager;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -29,6 +30,9 @@ public class MovieController {
 
 	@Autowired
 	MovieService service;
+	
+	@Autowired
+	UserManager userService;
 
 	@RequestMapping(value = "/updateMovieRating", method = RequestMethod.POST)
 	@ResponseBody
@@ -86,7 +90,19 @@ public class MovieController {
 		logProcessingTime(apiName, start);
 		return respJson;
 	}
-
+	
+	@RequestMapping(value = "/getUserRecommondation", method = RequestMethod.GET)
+	@ResponseBody
+	public JSONObject getUserRecommondation(@RequestParam("userId") String userName){
+		long start = System.currentTimeMillis();
+		LOGGER.info("Entering into getUserRecommondation : " + userName);
+		JSONObject respJson=new JSONObject();
+		String apiName="getUserRecommondation with username";
+		Long userId=userService.getUserId(userName);
+		respJson=getUserRecommondation(userId);
+		logProcessingTime(apiName, start);
+		return respJson;
+	}
 
 	/*@RequestMapping(value = "/home", method = RequestMethod.GET)
 	@ResponseBody
