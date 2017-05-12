@@ -13,10 +13,11 @@
     <intercept-url pattern="/css/**" access="permitAll"></intercept-url>
     <intercept-url pattern="/js/**" access="permitAll"></intercept-url>
         <intercept-url pattern="/login" access="permitAll"></intercept-url>
+        <intercept-url pattern="/registration" access="permitAll"></intercept-url>
         <intercept-url pattern="/logout" access="permitAll"></intercept-url>
         <intercept-url pattern="/accessdenied" access="permitAll"></intercept-url>
         <intercept-url pattern="/**" access="hasRole('ROLE_USER')"></intercept-url>
-        <form-login login-page="/login" default-target-url="/home2" authentication-failure-url="/accessdenied"></form-login>
+        <form-login login-page="/login" default-target-url="/home2" authentication-failure-url="/accessdenied "></form-login>
         <logout logout-success-url="/logout"></logout>
     </http>
  

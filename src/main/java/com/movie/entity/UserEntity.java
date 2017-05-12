@@ -3,7 +3,7 @@ package com.movie.entity;
 public class UserEntity {
 	private Integer userId;
 
-	private String userName;
+	private String username;
 
 	private String firstName;
 
@@ -14,6 +14,8 @@ public class UserEntity {
 	private Integer enable;
 	
 	private String password;
+	
+	private String passwordConfirm;
 
 	private String mobileNo;
 
@@ -25,12 +27,12 @@ public class UserEntity {
 		this.userId = userId;
 	}
 
-	public String getUserName() {
-		return userName;
+	public String getUsername() {
+		return username;
 	}
 
-	public void setUserName(String userName) {
-		this.userName = userName;
+	public void setUsername(String userName) {
+		this.username = userName;
 	}
 
 	public String getFirstName() {
@@ -83,8 +85,16 @@ public class UserEntity {
 
 	@Override
 	public String toString() {
-		return "UserEntity [userId=" + userId + ", userName=" + userName + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
+		return "UserEntity [userId=" + userId + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email
 			+ ", enable=" + enable + ", password=" + password + ", mobileNo=" + mobileNo + "]";
+	}
+
+	public String getPasswordConfirm() {
+		return passwordConfirm;
+	}
+
+	public void setPasswordConfirm(String passwordConfirm) {
+		this.passwordConfirm = passwordConfirm;
 	}
 
 }

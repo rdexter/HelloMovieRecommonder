@@ -7,8 +7,8 @@
 <%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
-<c:set var="userName" value="${pageContext.request.userPrincipal.name}"/>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
+<c:set var="userName" value="${pageContext.request.userPrincipal.name}" />
 
 <html>
 <head>
@@ -17,8 +17,6 @@
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Asap">
 <link href="/MovieRecommonder/resources/css/bootstrap.min.css"
 	rel="stylesheet">
-<script src="/MovieRecommonder/resources/js/bootstrap.min.js"></script>
-
 <style type="text/css">
 * {
 	font-family: 'Asap';
@@ -41,7 +39,8 @@
 				</div>
 				<h2>
 					<div class="pull-right">
-						<form action="/getUserRecommondation?user=${userName}" method="post">
+						<form action="/getUserRecommondation?user=${userName}"
+							method="post">
 							<button class="btn btn-primary">Refresh</button>
 						</form>
 					</div>
@@ -91,5 +90,9 @@
 			</div>
 		</div>
 	</div>
+	<!-- /container -->
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="/MovieRecommonder/resources/js/bootstrap.min.js"></script>
 </body>
 </html>

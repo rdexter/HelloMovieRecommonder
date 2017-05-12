@@ -34,8 +34,18 @@ public class UserDaoImpl implements UserDAO,UserDetailsService{
 	}
 	
 	public void addUser(UserEntity user) {
-		// TODO Auto-generated method stub
+		System.out.println("Entering into addUse "+user);
 		
+		String sql="insert into users (userName, firstName, lastName, email, enable, password,mobileNo)"
+				+ "value(?,?,?,?,?,?,?)";
+		Integer enable=user.getEnable()==null?1:user.getEnable();
+		try{
+			jdbcTemplate.update(sql, user.getUsername(),user.getFirstName(),user.getLastName(),user.getEmail(),
+					enable,user.getPassword(),user.getMobileNo());
+		}
+		catch(Exception e){
+			System.out.println("Exception occured "+e);
+		}
 	}
 
 	public List<UserEntity> getAllUsers() {
@@ -50,17 +60,17 @@ public class UserDaoImpl implements UserDAO,UserDetailsService{
 
 	@SuppressWarnings("deprecation")
 	public UserDetails loadUserByUsername(String username) {
-		UserDetails userDetails;
+		UserDetails userDetails = null;
 		UserEntity user=fetchUserDetails(username);
 		
 		 System.out.println("Getting access details from employee dao !!");
        if(user != null){
-      	 userDetails= new User(user.getUserName(), user.getPassword(), isEnabled(user.getEnable()), true, true, true, new GrantedAuthority[]{ new GrantedAuthorityImpl("ROLE_USER") });
-       }else{
+      	 userDetails= new User(user.getUsername(), user.getPassword(), isEnabled(user.getEnable()), true, true, true, new GrantedAuthority[]{ new GrantedAuthorityImpl("ROLE_USER") });
+       }/*else{
        // Ideally it should be fetched from database and populated instance of
        // #org.springframework.security.core.userdetails.User should be returned from this method
       	 userDetails= new User(username, "password", true, true, true, true, new GrantedAuthority[]{ new GrantedAuthorityImpl("ROLE_USER") });
-       }
+       }*/
        return userDetails;
 	}
 

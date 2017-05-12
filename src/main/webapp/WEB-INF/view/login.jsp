@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
-<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
+<c:set var="contextPath" value="${pageContext.request.contextPath}" />
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,7 +10,6 @@
 <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Asap">
 <link href="${contextPath}/resources/css/bootstrap.min.css"
 	rel="stylesheet">
-<script src="${contextPath}/resources/js/bootstrap.min.js"></script>
 
 <style type="text/css">
 * {
@@ -47,5 +46,9 @@
 			</div>
 		</div>
 	</div>
+	<!-- /container -->
+	<script
+		src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="${contextPath}/resources/js/bootstrap.min.js"></script>
 </body>
 </html>

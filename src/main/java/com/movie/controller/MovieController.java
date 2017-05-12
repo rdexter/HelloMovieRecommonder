@@ -29,7 +29,7 @@ public class MovieController {
 	private static final Logger LOGGER = Logger.getLogger(MovieController.class);
 
 	@Autowired
-	MovieService service;
+	MovieService movieService;
 	
 	@Autowired
 	UserManager userService;
@@ -45,7 +45,7 @@ public class MovieController {
 		boolean isValidReqJson=validateJson(reqJson,matrix);
 
 		if(isValidReqJson){
-			int isUpdatedSuccess=service.updateMovieRating(matrix);
+			int isUpdatedSuccess=movieService.updateMovieRating(matrix);
 			return isUpdatedSuccess;
 		}
 
@@ -85,7 +85,7 @@ public class MovieController {
 		LOGGER.info("Entering into getUserRecommondation : " + userId);
 		JSONObject respJson=new JSONObject();
 		String apiName="getUserRecommondation";
-		List<Movie> movieIds=service.getRecommondation(userId);
+		List<Movie> movieIds=movieService.getRecommondation(userId);
 		respJson.put("Recommonded MovieIds", movieIds);
 		logProcessingTime(apiName, start);
 		return respJson;
@@ -126,7 +126,7 @@ public class MovieController {
 		LOGGER.info("REQUEST home : ");
 		long userId=196;
 		int offset=1;
-		List<Movie> movieList=service.getMovies(userId,offset);
+		List<Movie> movieList=movieService.getMovies(userId,offset);
 		ModelAndView model = new ModelAndView();
 		model.addObject("movieList", movieList);
 		model.addObject("msg", "Hello moto");
@@ -142,7 +142,7 @@ public class MovieController {
 		long start = System.currentTimeMillis();
 		String apiName="home";
 		LOGGER.info("REQUEST home : ");
-		List<Movie> movieList=service.getMovies(userId,offset);
+		List<Movie> movieList=movieService.getMovies(userId,offset);
 		ModelAndView model = new ModelAndView();
 		model.addObject("movieList", movieList);
 		model.addObject("msg", "Hello moto");
@@ -161,11 +161,11 @@ public class MovieController {
 		LOGGER.info("REQUEST home : ");
 		long userId=196;
 		int offset=1;
-		List<Movie> movieList=service.getMovies(userId,offset);
+		List<Movie> movieList=movieService.getMovies(userId,offset);
 		model.addObject("movieList", movieList);
 		model.addObject("msg", "Hello moto");
 		LOGGER.info("movieList home : "+movieList.toString());
-		List<Movie> recommondedMovieList=service.getRecommondation(userId);
+		List<Movie> recommondedMovieList=movieService.getRecommondation(userId);
 		model.addObject("recommondedMovieList", recommondedMovieList);
 		logProcessingTime(apiName, start);
 		return "home";
@@ -183,7 +183,7 @@ public class MovieController {
 		MovieUserMatrix matrix= new MovieUserMatrix();
 		boolean isValidReqJson=validateJson(reqJson,matrix);
 		if(isValidReqJson){
-			int response=service.addMovieRating(matrix);
+			int response=movieService.addMovieRating(matrix);
 			LOGGER.info("response: "+response);
 			return response;
 		}
