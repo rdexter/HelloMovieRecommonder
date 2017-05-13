@@ -6,21 +6,15 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.servlet.ModelAndView;
 
 import com.movie.entity.Movie;
 import com.movie.entity.MovieUserMatrix;
 import com.movie.service.MovieService;
+import com.movie.service.SecurityService;
 import com.movie.service.UserManager;
-
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
-import net.sf.json.JSONSerializer;
 
 @Controller
 //@RequestMapping("/api")
@@ -30,166 +24,165 @@ public class MovieController {
 
 	@Autowired
 	MovieService movieService;
-	
+
 	@Autowired
 	UserManager userService;
 
-	@RequestMapping(value = "/updateMovieRating", method = RequestMethod.POST)
-	@ResponseBody
-	public int updateMovieRating(@RequestBody String jsonString){
+	@Autowired
+	private SecurityService securityService;
+
+	@RequestMapping(value = "/updateMovieRating", method = {RequestMethod.GET,RequestMethod.POST})
+	public String updateMovieRating(ModelMap model,@RequestParam("user") String userName, @RequestParam("movieId") long movieId,
+			@RequestParam("like") int like){
 		long start = System.currentTimeMillis();
 		String apiName="updateMovieRating";
-		LOGGER.info("Entering into updateMovieRating : " + jsonString);
-		JSONObject reqJson=(JSONObject) JSONSerializer.toJSON(jsonString);
+		LOGGER.info("Entering into updateMovieRating user: " + userName+"  movieId: "+movieId+"  like: "+like);
 		MovieUserMatrix matrix= new MovieUserMatrix();
-		boolean isValidReqJson=validateJson(reqJson,matrix);
-
-		if(isValidReqJson){
-			int isUpdatedSuccess=movieService.updateMovieRating(matrix);
-			return isUpdatedSuccess;
-		}
-
-		logProcessingTime(apiName, start);
-		return 0;
-	}
-
-	private boolean validateJson(JSONObject reqJson,MovieUserMatrix matrix) {
-		if(reqJson.has("userId")){
-			matrix.setUserId(reqJson.getLong("userId"));
-		}
-		else{
-			return false;
-		}
-		if(reqJson.has("movieId")){
-			matrix.setMovieId(reqJson.getLong("movieId"));
-		}
-		else{
-			return false;
-		}
-		if(reqJson.has("rating")){
-			matrix.setRating(reqJson.getInt("rating"));
-		}
-		else{
-			return false;
-		}
-		if(reqJson.has("like")){
-			matrix.setUserId(reqJson.getLong("like"));
-		}
-		return true;
-	}
-
-	@RequestMapping(value = "/getUserRecommondation", method = RequestMethod.GET)
-	@ResponseBody
-	public JSONObject getUserRecommondation(@RequestParam("userId") long userId){
-		long start = System.currentTimeMillis();
-		LOGGER.info("Entering into getUserRecommondation : " + userId);
-		JSONObject respJson=new JSONObject();
-		String apiName="getUserRecommondation";
-		List<Movie> movieIds=movieService.getRecommondation(userId);
-		respJson.put("Recommonded MovieIds", movieIds);
-		logProcessingTime(apiName, start);
-		return respJson;
-	}
-	
-	@RequestMapping(value = "/getUserRecommondation", method = RequestMethod.GET)
-	@ResponseBody
-	public JSONObject getUserRecommondation(@RequestParam("userId") String userName){
-		long start = System.currentTimeMillis();
-		LOGGER.info("Entering into getUserRecommondation : " + userName);
-		JSONObject respJson=new JSONObject();
-		String apiName="getUserRecommondation with username";
 		Long userId=userService.getUserId(userName);
-		respJson=getUserRecommondation(userId);
-		logProcessingTime(apiName, start);
-		return respJson;
-	}
-
-	/*@RequestMapping(value = "/home", method = RequestMethod.GET)
-	@ResponseBody
-	public JSONArray home(@RequestParam("userId") long userId){
-		long start = System.currentTimeMillis();
-		String apiName="home";
-		LOGGER.info("REQUEST home : ");
-		List<Movie> movieList=service.getMovies(1);
-		JSONArray jsonArray=new JSONArray();
-		jsonArray.addAll(movieList);
-		logProcessingTime(apiName, start);
-		return jsonArray;
-	}*/
-
-	@RequestMapping(value = "/home", method = RequestMethod.GET)
-	@ResponseBody
-	//public ModelAndView home(@RequestParam("userId") long userId,@RequestParam("offset") int offset) {
-	public ModelAndView home() {
-		long start = System.currentTimeMillis();
-		String apiName="home";
-		LOGGER.info("REQUEST home : ");
-		long userId=196;
-		int offset=1;
-		List<Movie> movieList=movieService.getMovies(userId,offset);
-		ModelAndView model = new ModelAndView();
-		model.addObject("movieList", movieList);
-		model.addObject("msg", "Hello moto");
-		LOGGER.info("movieList home : "+movieList.toString());
-		logProcessingTime(apiName, start);
-		model.setViewName("home");
-		return model;
-	}
-
-	@RequestMapping(value = "/home1", method = RequestMethod.GET)
-	@ResponseBody
-	public JSONArray home1(@RequestParam("userId") long userId,@RequestParam("offset") int offset) {
-		long start = System.currentTimeMillis();
-		String apiName="home";
-		LOGGER.info("REQUEST home : ");
-		List<Movie> movieList=movieService.getMovies(userId,offset);
-		ModelAndView model = new ModelAndView();
-		model.addObject("movieList", movieList);
-		model.addObject("msg", "Hello moto");
-		LOGGER.info("movieList home : "+movieList.toString());
-		JSONArray jsonArray=new JSONArray();
-		jsonArray.addAll(movieList);
-		logProcessingTime(apiName, start);
-		model.setViewName("home");
-		return jsonArray;
-	}
-
-	@RequestMapping(value = "/home2", method = RequestMethod.GET)
-	public String home2(ModelMap model) {
-		long start = System.currentTimeMillis();
-		String apiName="home";
-		LOGGER.info("REQUEST home : ");
-		long userId=196;
-		int offset=1;
-		List<Movie> movieList=movieService.getMovies(userId,offset);
-		model.addObject("movieList", movieList);
-		model.addObject("msg", "Hello moto");
-		LOGGER.info("movieList home : "+movieList.toString());
+		if(userId==null){
+			userId=196l;
+		}else{
+			LOGGER.info("userId recerived: "+userId);
+		}
+		matrix.setUserId(userId);
+		matrix.setMovieId(movieId);
+		
+		if(like==1){
+			int rati= (int) ((userId%6)>=3?(userId%6):4);
+			matrix.setRating(rati);
+		}
+		else{
+			int rati=(int) ((userId%6)<3?(userId%6):1);
+			matrix.setRating(rati);
+		}
+		int isUpdatedSuccess=movieService.updateMovieRating(matrix);
+		LOGGER.info("isUpdatedSuccess: "+isUpdatedSuccess);
+		
 		List<Movie> recommondedMovieList=movieService.getRecommondation(userId);
+		int pageNumber=1;
+		List<Movie> movieList=null;
+		if(userId!= null){
+			movieList=movieService.getMovies(userId,pageNumber+1);
+		}else{
+			movieList=movieService.getMovies(pageNumber+1);
+		}
+		LOGGER.info("recommondedMovieList home : "+recommondedMovieList);
+		LOGGER.info("movieList home : "+movieList);
 		model.addObject("recommondedMovieList", recommondedMovieList);
+		model.addObject("movieList", movieList);
+		model.addObject("pageNumber", pageNumber);
+		
 		logProcessingTime(apiName, start);
 		return "home";
 	}
 
 
-
-	@RequestMapping(value = "/addMovieLikeByTheUser", method = RequestMethod.GET)
-	@ResponseBody
-	public int addMovieLikeByTheUser(@RequestBody String jsonString){
+	@RequestMapping(value = "/getUserRecommondation", method = {RequestMethod.GET,RequestMethod.POST})
+	public String getUserRecommondation(ModelMap model,@RequestParam("user") String userName, @RequestParam("pageNumber") int pageNumber){
+		String apiName="getUserRecommondation";
 		long start = System.currentTimeMillis();
-		String apiName="addMovieLikeByTheUser";
-
-		JSONObject reqJson=(JSONObject) JSONSerializer.toJSON(jsonString);
-		MovieUserMatrix matrix= new MovieUserMatrix();
-		boolean isValidReqJson=validateJson(reqJson,matrix);
-		if(isValidReqJson){
-			int response=movieService.addMovieRating(matrix);
-			LOGGER.info("response: "+response);
-			return response;
+		LOGGER.info("Entering into nextMoviesList : " + userName+"  pageNumber: "+pageNumber);
+		Long userId=userService.getUserId(userName);
+		if(userId==null){
+			userId=196l;
+		}else{
+			LOGGER.info("null userId recerived");
 		}
+		List<Movie> recommondedMovieList=movieService.getRecommondation(userId);
+		List<Movie> movieList=null;
+		if(userId!= null){
+			movieList=movieService.getMovies(userId,pageNumber+1);
+		}else{
+			movieList=movieService.getMovies(pageNumber+1);
+		}
+		LOGGER.info("recommondedMovieList home : "+recommondedMovieList);
+		LOGGER.info("movieList home : "+movieList);
+		model.addObject("recommondedMovieList", recommondedMovieList);
+		model.addObject("movieList", movieList);
+		model.addObject("pageNumber", pageNumber);
+
 		logProcessingTime(apiName, start);
-		return 0;
+		return "home";
 	}
+
+	@RequestMapping(value = "/home2", method = RequestMethod.GET)
+	public String home2(ModelMap model) {
+		long start = System.currentTimeMillis();
+		String apiName="home2";
+		int pageNumber=1;
+		LOGGER.info("REQUEST home2 : ");
+		List<Movie> movieList=movieService.getMovies(pageNumber);
+		model.addObject("movieList", movieList);
+		model.addObject("pageNumber", pageNumber);
+		LOGGER.info("movieList home : "+movieList);
+		logProcessingTime(apiName, start);
+		return "home";
+	}
+
+
+	@RequestMapping(value = "/next", method = {RequestMethod.GET,RequestMethod.POST})
+	public String nextMoviesList(ModelMap model,@RequestParam("user") String userName, @RequestParam("pageNumber") int pageNumber) {
+		String apiName="nextMovies";
+		long start = System.currentTimeMillis();
+		LOGGER.info("Entering into nextMoviesList : " + userName+"  pageNumber: "+pageNumber);
+		Long userId=userService.getUserId(userName);
+		if(userId==null){
+			userId=196l;
+		}else{
+			LOGGER.info("userId recerived "+userId);
+		}
+		pageNumber=pageNumber+1;
+		List<Movie> recommondedMovieList=movieService.getRecommondation(userId);
+		List<Movie> movieList=null;
+		if(userId!= null){
+			movieList=movieService.getMovies(userId,pageNumber+1);
+		}else{
+			movieList=movieService.getMovies(pageNumber+1);
+		}
+		LOGGER.info("recommondedMovieList home : "+recommondedMovieList);
+		LOGGER.info("movieList home : "+movieList);
+		model.addObject("recommondedMovieList", recommondedMovieList);
+		model.addObject("movieList", movieList);
+		model.addObject("pageNumber", pageNumber);
+
+		logProcessingTime(apiName, start);
+		return "home";
+	}
+
+	@RequestMapping(value = "/back", method = {RequestMethod.GET,RequestMethod.POST})
+	public String previousMoviesList(ModelMap model,@RequestParam("user") String userName, @RequestParam("pageNumber") int pageNumber) {
+		String apiName="back";
+		long start = System.currentTimeMillis();
+		LOGGER.info("Entering into previousMoviesList : " + userName+"  pageNumber: "+pageNumber);
+		Long userId=userService.getUserId(userName);
+		if(userId==null){
+			userId=196l;
+		}else{
+			LOGGER.info("null userId recerived");
+		}
+		if(pageNumber<=1){
+			pageNumber=2;
+		}else{
+			pageNumber=pageNumber-1;
+		}
+		List<Movie> recommondedMovieList=movieService.getRecommondation(userId);
+		List<Movie> movieList=null;
+		if(userId!= null){
+			movieList=movieService.getMovies(userId,pageNumber+1);
+		}else{
+			movieList=movieService.getMovies(pageNumber+1);
+		}
+		LOGGER.info("recommondedMovieList home : "+recommondedMovieList);
+		LOGGER.info("movieList home : "+movieList);
+		model.addObject("recommondedMovieList", recommondedMovieList);
+		model.addObject("movieList", movieList);
+		model.addObject("pageNumber", pageNumber);
+
+		logProcessingTime(apiName, start);
+		return "home";
+	}
+
+
 	private void logProcessingTime(String api, long start) {
 		System.out.println("Processing time : " + api + " : " + (System.currentTimeMillis() - start) + " ms");
 		LOGGER.info("Processing time : " + api + " : " + (System.currentTimeMillis() - start) + " ms");

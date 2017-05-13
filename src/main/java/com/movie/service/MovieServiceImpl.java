@@ -136,11 +136,19 @@ public class MovieServiceImpl implements MovieService {
 	public int addMovieRating(MovieUserMatrix matrix) {
 		return dao.addMovieRating(matrix);
 	}
-	public List<Movie> getMovies(long userId, int pageNumber) {
-		return dao.getMovies(userId,pageNumber);
+	public List<Movie> getMovies(int pageNumber) {
+		return dao.getMovies(pageNumber);
 	}
 	public int updateMovieRating(MovieUserMatrix matrix) {
-		return dao.updateMovieRating(matrix);
+		int row= dao.updateMovieRating(matrix);
+		if(row==0){
+			row=addMovieRating(matrix);
+		}
+		return row;
+	}
+
+	public List<Movie> getMovies(Long userId, int i) {
+		return dao.getMovies(userId,i);
 	}
 
 }

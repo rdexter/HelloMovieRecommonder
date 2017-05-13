@@ -36,10 +36,9 @@
 							<!-- 							<input name="submit" type="submit">&nbsp;<input
 										name="reset" type="reset"> -->
 							<button class="btn btn-primary">Login</button>
-							<a href="<c:url value='registeration_form'/>"><button
-									class="btn btn-primary">register your self</button></a>
-
 						</form>
+						<a href="<c:url value='/registration'/>"><button
+									class="btn btn-primary">register your self</button></a>
 
 					</div>
 				</div>

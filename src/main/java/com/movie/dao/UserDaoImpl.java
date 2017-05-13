@@ -22,7 +22,7 @@ public class UserDaoImpl implements UserDAO,UserDetailsService{
 	}
 
 	public Long getUserId(String userName) {
-		String sql="SELECT id from user where user_name=?";
+		String sql="SELECT userId from users where userName=?";
 		try{
 			Long userId=jdbcTemplate.queryForObject(sql, Long.class, userName);
 			return userId;

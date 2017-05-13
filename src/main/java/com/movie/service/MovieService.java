@@ -12,8 +12,10 @@ public interface MovieService {
 	
 	int addMovieRating(MovieUserMatrix matrix);
 	
-	List<Movie> getMovies(long userId, int pageNumber);
+	List<Movie> getMovies(int pagenumber);
 
 	int updateMovieRating(MovieUserMatrix matrix);
+
+	List<Movie> getMovies(Long userId, int i);
 
 }

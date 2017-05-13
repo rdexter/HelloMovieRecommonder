@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import com.movie.controller.MovieController;
 import com.movie.entity.Movie;
 import com.movie.entity.MovieUserMatrix;
 
@@ -18,7 +17,9 @@ import com.movie.entity.MovieUserMatrix;
 public class MovieDaoImpl implements MovieDao {
 	/** The logger. */
 	private static final Logger LOGGER = Logger.getLogger(MovieDaoImpl.class);
-	private static final int LIMIT = 8;
+	private static final int LIMIT = 4;
+	private static final int MAX_LIMIT = 12;
+	
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
@@ -36,10 +37,10 @@ public class MovieDaoImpl implements MovieDao {
 	}
 
 	public List<Long> getUsersWhoLikeTheMovie(long movieId) {
-		LOGGER.info("Entering into getUsersWhoLikeTheMovie .. "+movieId);
+		//LOGGER.info("Entering into getUsersWhoLikeTheMovie .. "+movieId);
 		try{
 			//String sql="select movieId from movie_user_matrix where userId=? and ";
-			String sql="select user_id from rating where movie_id=? and ratings>=3";
+			String sql="select user_id from rating where movie_id=? and ratings>=3 and enabled=1 limit "+MAX_LIMIT;
 			List<Long> movieIds=new ArrayList<Long>();
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, movieId);
 			for (Map<String, Object> map : resultSet) {
@@ -55,10 +56,10 @@ public class MovieDaoImpl implements MovieDao {
 	}
 
 	public List<Long> getUsersWhoDisLikeTheMovie(long movieId) {
-		LOGGER.info("Entering into getUsersWhoDisLikeTheMovie .. "+movieId);
+		//LOGGER.info("Entering into getUsersWhoDisLikeTheMovie .. "+movieId);
 		try{
 			//String sql="select movieId from movie_user_matrix where userId=? and ";
-			String sql="select user_id from rating where movie_id=? and ratings<3 and ratings>0";
+			String sql="select user_id from rating where movie_id=? and ratings<3 and ratings>=0 and enabled=1 limit "+MAX_LIMIT;
 			List<Long> movieIds=new ArrayList<Long>();
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, movieId);
 			for (Map<String, Object> map : resultSet) {
@@ -74,10 +75,10 @@ public class MovieDaoImpl implements MovieDao {
 	}
 
 	public List<Long> getMoviesLikeByTheUser(long userId) {
-		LOGGER.info("Entering into getMoviesLikeByTheUser .. "+userId);
+		//LOGGER.info("Entering into getMoviesLikeByTheUser .. "+userId);
 		try{
 			//String sql="select movieId from movie_user_matrix where userId=? and ";
-			String sql="select movie_id from rating where user_id=? and ratings>=3";
+			String sql="select movie_id from rating where user_id=? and ratings>=3 and enabled=1 limit "+MAX_LIMIT;
 			List<Long> movieIds=new ArrayList<Long>();
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, userId);
 			for (Map<String, Object> map : resultSet) {
@@ -94,10 +95,10 @@ public class MovieDaoImpl implements MovieDao {
 	}
 
 	public List<Long> getMoviesDisLikeByTheUser(long userId) {
-		LOGGER.info("Entering into getMoviesDisLikeByTheUser .. "+userId);
+		//LOGGER.info("Entering into getMoviesDisLikeByTheUser .. "+userId);
 		try{
 			//String sql="select movieId from movie_user_matrix where userId=? and ";
-			String sql="select movie_id from rating where user_id=? and ratings<3 and ratings>0";
+			String sql="select movie_id from rating where user_id=? and ratings<3 and ratings>=0 and enabled=1 limit "+MAX_LIMIT;
 			List<Long> movieIds=new ArrayList<Long>();
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, userId);
 			for (Map<String, Object> map : resultSet) {
@@ -117,7 +118,7 @@ public class MovieDaoImpl implements MovieDao {
 		LOGGER.info("Entering into getMoviesNotRatedByTheUsers .. "+userId);
 		try{
 			//String sql="select movieId from movie_user_matrix where userId=? and ";
-			String sql="select movie_id from rating where user_id=? and ratings=0";
+			String sql="select distinct (movie_id) from rating where user_id!=? and enabled=1 order by updated_on desc limit "+MAX_LIMIT;
 			List<Long> movieIds=new ArrayList<Long>();
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, userId);
 			for (Map<String, Object> map : resultSet) {
@@ -134,14 +135,13 @@ public class MovieDaoImpl implements MovieDao {
 		return null;
 	}
 
-	public List<Movie> getMovies(long userId, int pageNumber) {
-		LOGGER.info("Entering into getMovies .. ");
+	public List<Movie> getMovies( int pageNumber) {
+		LOGGER.info("Entering into getMovies .. "+pageNumber);
 
 		try{
-			String sql="SELECT movie_id,movie_name,url FROM movie ORDER BY updated_on desc LIMIT ? OFFSET ?";
+			String sql="SELECT movie_id,movie_name,url FROM movie where enabled=1 ORDER BY updated_on desc LIMIT ? OFFSET ? ";
 			List<Movie> movieList=new ArrayList<Movie>();
 			Integer offset=(pageNumber-1)*LIMIT+1;	
-			offset=0;
 			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql, LIMIT,offset);
 			for (Map<String, Object> map : resultSet) {
 				Movie m=new Movie();
@@ -157,7 +157,30 @@ public class MovieDaoImpl implements MovieDao {
 		}
 		return null;
 	}
+	
+	public List<Movie> getMovies( Long userId,int pageNumber) {
+		LOGGER.info("Entering into getMovies userId  .. "+userId+" pageNumber "+pageNumber);
 
+		try{
+			String sql="SELECT m.movie_id,m.movie_name,m.url FROM movie m,rating r where r.user_id!=? and r.enabled=1 ORDER BY r.updated_on desc LIMIT ? OFFSET ? ";
+			List<Movie> movieList=new ArrayList<Movie>();
+			Integer offset=(pageNumber-1)*LIMIT+1;	
+			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql,userId, LIMIT,offset);
+			for (Map<String, Object> map : resultSet) {
+				Movie m=new Movie();
+				m.setId(Long.valueOf(map.get("movie_id").toString()));
+				m.setTitle(map.get("movie_name").toString());
+				m.setUrl(map.get("url").toString());
+
+				movieList.add(m);
+			}
+			return movieList;
+		}catch(Exception e){
+			LOGGER.info("Exception occured..."+e);
+		}
+		return null;
+	}
+	
 	public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
 		this.jdbcTemplate = jdbcTemplate;
 	}
@@ -183,23 +206,31 @@ public class MovieDaoImpl implements MovieDao {
 
 	public List<Movie> getMoviesByUserIds(List<Long> movieIdArray) {
 		LOGGER.info("Entering into updateMovieRating .. "+movieIdArray.toString());
-
+		List<Movie> movieList= new ArrayList<Movie>();
 		try{
-			String sql="SELECT movie_id,movie_name,url FROM movie where movie_id in (?)";
-			List<Movie> movieList=new ArrayList<Movie>();
-			List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql,movieIdArray);
-			for (Map<String, Object> map : resultSet) {
-				Movie m=new Movie();
-				m.setId(Long.valueOf(map.get("movie_id").toString()));
-				m.setTitle(map.get("movie_name").toString());
-				m.setUrl(map.get("url").toString());
+			
+			if(movieIdArray!=null && movieIdArray.size()>0){
+				String movieIds="";
+				for (Long movieId : movieIdArray) {
+					movieIds=movieIds+movieId+", ";
+				}
+				int lastInd=movieIds.lastIndexOf(",");
+				movieIds=movieIds.substring(0,lastInd);
+				String sql="SELECT movie_id,movie_name,url FROM movie where movie_id in ("+movieIds+") and enabled=1";
 
-				movieList.add(m);
+				List<Map<String,Object>> resultSet=jdbcTemplate.queryForList(sql);
+				for (Map<String, Object> map : resultSet) {
+					Movie m=new Movie();
+					m.setId(Long.valueOf(map.get("movie_id").toString()));
+					m.setTitle(map.get("movie_name").toString());
+					m.setUrl(map.get("url").toString());
+
+					movieList.add(m);
+				}
 			}
-			return movieList;
 		}catch(Exception e){
 			LOGGER.info("Exception occured..."+e);
 		}
-		return null;
+		return movieList;
 	}
 }

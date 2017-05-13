@@ -19,13 +19,15 @@ public interface MovieDao {
 
 	List<Long> getMoviesNotRatedByTheUsers(long userId);
 
-	List<Movie> getMovies(long userId, int pageNumber);
+	List<Movie> getMovies(int userId);
 
 	int updateMovieRating(MovieUserMatrix matrix);
 	
 	int addMovieRating(MovieUserMatrix matrix);
 
 	List<Movie> getMoviesByUserIds(List<Long> movieIdArray);
+
+	List<Movie> getMovies(Long userId, int i);
 
 
 }
